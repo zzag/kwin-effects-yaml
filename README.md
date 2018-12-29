@@ -15,6 +15,15 @@ using another window minimize animation (e.g. [Scale](https://store.kde.org/p/12
 
 ### Installation
 
+#### Binary package
+
+On openSUSE Tumbleweed
+
+```sh
+sudo zypper ar obs://home:trmdi trmdi
+sudo zypper in -r trmdi kwin-effects-yaml
+```
+
 #### Build from source
 
 You will need the following dependencies to build this effect:
@@ -61,15 +70,6 @@ cmake .. \
     -DCMAKE_INSTALL_PREFIX=/usr
 make
 sudo make install
-```
-
-#### Binary package
-
-On openSUSE Tumbleweed
-
-```sh
-sudo zypper ar obs://home:trmdi trmdi
-sudo zypper in -r trmdi kwin-effects-yaml
 ```
 
 ### Using the effect
