@@ -42,6 +42,13 @@ sudo dnf install cmake extra-cmake-modules kf5-kconfig-devel \
     qt5-qtbase-devel
 ```
 
+On openSUSE Tumbleweed
+
+```sh
+sudo zypper ar obs://home:trmdi trmdi
+sudo zypper in -r trmdi kwin-effects-yaml
+```
+
 On Ubuntu
 
 ```sh
