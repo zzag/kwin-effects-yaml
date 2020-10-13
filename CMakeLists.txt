@@ -32,10 +32,14 @@ find_package(KF5 REQUIRED COMPONENTS
     WindowSystem
 )
 
-find_package(kwineffects REQUIRED COMPONENTS
+find_package(XCB)
+
+find_package(KWinEffects REQUIRED COMPONENTS
     kwineffects
     kwinglutils
 )
+
+find_package(KWaylandServer REQUIRED)
 
 find_package(KWinDBusInterface CONFIG REQUIRED)
 
