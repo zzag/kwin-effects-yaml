@@ -27,8 +27,6 @@
 #include "hacks/TimeLine.h"
 #endif
 
-class WindowQuad;
-
 /**
  * Model for the magic lamp animation.
  **/
@@ -87,7 +85,7 @@ public:
      *
      * @param quadds The list of window quads to be transformed.
      **/
-    void apply(QVector<WindowQuad>& quads) const;
+    void apply(QVector<KWin::WindowQuad>& quads) const;
 
     /**
      * Returns the parameters of the model.
@@ -128,10 +126,10 @@ public:
     QRegion clipRegion() const;
 
 private:
-    void applyBump(QVector<WindowQuad>& quads) const;
-    void applyStretch1(QVector<WindowQuad>& quads) const;
-    void applyStretch2(QVector<WindowQuad>& quads) const;
-    void applySquash(QVector<WindowQuad>& quads) const;
+    void applyBump(QVector<KWin::WindowQuad>& quads) const;
+    void applyStretch1(QVector<KWin::WindowQuad>& quads) const;
+    void applyStretch2(QVector<KWin::WindowQuad>& quads) const;
+    void applySquash(QVector<KWin::WindowQuad>& quads) const;
 
     void updateMinimizeStage();
     void updateUnminimizeStage();

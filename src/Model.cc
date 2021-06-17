@@ -17,7 +17,6 @@
 
 // Own
 #include "Model.h"
-#include "WindowQuad.h"
 
 static inline std::chrono::milliseconds durationFraction(std::chrono::milliseconds duration, qreal fraction)
 {
@@ -297,7 +296,7 @@ static inline qreal interpolate(qreal from, qreal to, qreal t)
 static void transformQuadsLeft(
     const KWin::EffectWindow* window,
     const TransformParameters& params,
-    QVector<WindowQuad>& quads)
+    QVector<KWin::WindowQuad>& quads)
 {
     // FIXME: Have a generic function that transforms window quads. Perhaps,
     // a better approach is to have a transform method that operates on each
@@ -309,7 +308,7 @@ static void transformQuadsLeft(
     const qreal distance = windowRect.right() - iconRect.right() + params.bumpDistance;
 
     for (int i = 0; i < quads.count(); ++i) {
-        WindowQuad& quad = quads[i];
+        KWin::WindowQuad& quad = quads[i];
 
         const qreal leftOffset = quad[0].x() - interpolate(0.0, distance, params.squashProgress);
         const qreal rightOffset = quad[2].x() - interpolate(0.0, distance, params.squashProgress);
@@ -340,7 +339,7 @@ static void transformQuadsLeft(
 static void transformQuadsTop(
     const KWin::EffectWindow* window,
     const TransformParameters& params,
-    QVector<WindowQuad>& quads)
+    QVector<KWin::WindowQuad>& quads)
 {
     // FIXME: Have a generic function that transforms window quads. Perhaps,
     // a better approach is to have a transform method that operates on each
@@ -352,7 +351,7 @@ static void transformQuadsTop(
     const qreal distance = windowRect.bottom() - iconRect.bottom() + params.bumpDistance;
 
     for (int i = 0; i < quads.count(); ++i) {
-        WindowQuad& quad = quads[i];
+        KWin::WindowQuad& quad = quads[i];
 
         const qreal topOffset = quad[0].y() - interpolate(0.0, distance, params.squashProgress);
         const qreal bottomOffset = quad[2].y() - interpolate(0.0, distance, params.squashProgress);
@@ -383,7 +382,7 @@ static void transformQuadsTop(
 static void transformQuadsRight(
     const KWin::EffectWindow* window,
     const TransformParameters& params,
-    QVector<WindowQuad>& quads)
+    QVector<KWin::WindowQuad>& quads)
 {
     // FIXME: Have a generic function that transforms window quads. Perhaps,
     // a better approach is to have a transform method that operates on each
@@ -395,7 +394,7 @@ static void transformQuadsRight(
     const qreal distance = iconRect.left() - windowRect.left() + params.bumpDistance;
 
     for (int i = 0; i < quads.count(); ++i) {
-        WindowQuad& quad = quads[i];
+        KWin::WindowQuad& quad = quads[i];
 
         const qreal leftOffset = quad[0].x() + interpolate(0.0, distance, params.squashProgress);
         const qreal rightOffset = quad[2].x() + interpolate(0.0, distance, params.squashProgress);
@@ -426,7 +425,7 @@ static void transformQuadsRight(
 static void transformQuadsBottom(
     const KWin::EffectWindow* window,
     const TransformParameters& params,
-    QVector<WindowQuad>& quads)
+    QVector<KWin::WindowQuad>& quads)
 {
     // FIXME: Have a generic function that transforms window quads. Perhaps,
     // a better approach is to have a transform method that operates on each
@@ -438,7 +437,7 @@ static void transformQuadsBottom(
     const qreal distance = iconRect.top() - windowRect.top() + params.bumpDistance;
 
     for (int i = 0; i < quads.count(); ++i) {
-        WindowQuad& quad = quads[i];
+        KWin::WindowQuad& quad = quads[i];
 
         const qreal topOffset = quad[0].y() + interpolate(0.0, distance, params.squashProgress);
         const qreal bottomOffset = quad[2].y() + interpolate(0.0, distance, params.squashProgress);
@@ -469,7 +468,7 @@ static void transformQuadsBottom(
 static void transformQuads(
     const KWin::EffectWindow* window,
     const TransformParameters& params,
-    QVector<WindowQuad>& quads)
+    QVector<KWin::WindowQuad>& quads)
 {
     switch (params.direction) {
     case Direction::Left:
@@ -493,7 +492,7 @@ static void transformQuads(
     }
 }
 
-void Model::apply(QVector<WindowQuad>& quads) const
+void Model::apply(QVector<KWin::WindowQuad>& quads) const
 {
     switch (m_stage) {
     case AnimationStage::Bump:
@@ -514,7 +513,7 @@ void Model::apply(QVector<WindowQuad>& quads) const
     }
 }
 
-void Model::applyBump(QVector<WindowQuad>& quads) const
+void Model::applyBump(QVector<KWin::WindowQuad>& quads) const
 {
     TransformParameters params;
     params.shapeCurve = m_parameters.shapeCurve;
@@ -526,7 +525,7 @@ void Model::applyBump(QVector<WindowQuad>& quads) const
     transformQuads(m_window, params, quads);
 }
 
-void Model::applyStretch1(QVector<WindowQuad>& quads) const
+void Model::applyStretch1(QVector<KWin::WindowQuad>& quads) const
 {
     TransformParameters params;
     params.shapeCurve = m_parameters.shapeCurve;
@@ -538,7 +537,7 @@ void Model::applyStretch1(QVector<WindowQuad>& quads) const
     transformQuads(m_window, params, quads);
 }
 
-void Model::applyStretch2(QVector<WindowQuad>& quads) const
+void Model::applyStretch2(QVector<KWin::WindowQuad>& quads) const
 {
     TransformParameters params;
     params.shapeCurve = m_parameters.shapeCurve;
@@ -550,7 +549,7 @@ void Model::applyStretch2(QVector<WindowQuad>& quads) const
     transformQuads(m_window, params, quads);
 }
 
-void Model::applySquash(QVector<WindowQuad>& quads) const
+void Model::applySquash(QVector<KWin::WindowQuad>& quads) const
 {
     TransformParameters params;
     params.shapeCurve = m_parameters.shapeCurve;
