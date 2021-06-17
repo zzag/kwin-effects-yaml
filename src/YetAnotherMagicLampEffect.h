@@ -22,12 +22,9 @@
 #include "common.h"
 
 // kwineffects
-#include <kwineffects.h>
+#include <kwindeformeffect.h>
 
-class OffscreenRenderer;
-class WindowMeshRenderer;
-
-class YetAnotherMagicLampEffect : public KWin::Effect {
+class YetAnotherMagicLampEffect : public KWin::DeformEffect {
     Q_OBJECT
 
 public:
@@ -40,13 +37,16 @@ public:
     void postPaintScreen() override;
 
     void prePaintWindow(KWin::EffectWindow* w, KWin::WindowPrePaintData& data, std::chrono::milliseconds presentTime) override;
+    void paintWindow(KWin::EffectWindow* w, int mask, QRegion region, KWin::WindowPaintData& data) override;
 
-    void drawWindow(KWin::EffectWindow* w, int mask, const QRegion& region, KWin::WindowPaintData& data) override;
 
     bool isActive() const override;
     int requestedEffectChainPosition() const override;
 
     static bool supported();
+
+protected:
+    void deform(KWin::EffectWindow *window, int mask, KWin::WindowPaintData &data, KWin::WindowQuadList &quads) override;
 
 private Q_SLOTS:
     void slotWindowMinimized(KWin::EffectWindow* w);
@@ -60,8 +60,6 @@ private:
     std::chrono::milliseconds m_lastPresentTime;
 
     QMap<KWin::EffectWindow*, Model> m_models;
-    OffscreenRenderer* m_offscreenRenderer;
-    WindowMeshRenderer* m_meshRenderer;
 };
 
 inline int YetAnotherMagicLampEffect::requestedEffectChainPosition() const

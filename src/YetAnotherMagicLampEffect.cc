@@ -18,8 +18,6 @@
 // Own
 #include "YetAnotherMagicLampEffect.h"
 #include "Model.h"
-#include "OffscreenRenderer.h"
-#include "WindowMeshRenderer.h"
 
 // Auto-generated
 #include "YetAnotherMagicLampConfig.h"
@@ -52,9 +50,6 @@ YetAnotherMagicLampEffect::YetAnotherMagicLampEffect()
         this, &YetAnotherMagicLampEffect::slotWindowDeleted);
     connect(KWin::effects, &KWin::EffectsHandler::activeFullScreenEffectChanged,
         this, &YetAnotherMagicLampEffect::slotActiveFullScreenEffectChanged);
-
-    m_offscreenRenderer = new OffscreenRenderer(this);
-    m_meshRenderer = new WindowMeshRenderer(this);
 }
 
 YetAnotherMagicLampEffect::~YetAnotherMagicLampEffect()
@@ -149,7 +144,7 @@ void YetAnotherMagicLampEffect::postPaintScreen()
     auto modelIt = m_models.begin();
     while (modelIt != m_models.end()) {
         if ((*modelIt).done()) {
-            m_offscreenRenderer->unregisterWindow(modelIt.key());
+            unredirect(modelIt.key());
             modelIt = m_models.erase(modelIt);
         } else {
             ++modelIt;
@@ -173,25 +168,32 @@ void YetAnotherMagicLampEffect::prePaintWindow(KWin::EffectWindow* w, KWin::Wind
     KWin::effects->prePaintWindow(w, data, presentTime);
 }
 
-void YetAnotherMagicLampEffect::drawWindow(KWin::EffectWindow* w, int mask, const QRegion& region, KWin::WindowPaintData& data)
+void YetAnotherMagicLampEffect::paintWindow(KWin::EffectWindow* w, int mask, QRegion region, KWin::WindowPaintData& data)
 {
+    QRegion clip = region;
+
     auto modelIt = m_models.constFind(w);
+    if (modelIt != m_models.constEnd()) {
+        if ((*modelIt).needsClip()) {
+            clip = (*modelIt).clipRegion();
+        }
+    }
+
+    KWin::effects->paintWindow(w, mask, clip, data);
+}
+
+void YetAnotherMagicLampEffect::deform(KWin::EffectWindow *window, int mask, KWin::WindowPaintData &data, KWin::WindowQuadList &quads)
+{
+    Q_UNUSED(mask)
+    Q_UNUSED(data)
+
+    auto modelIt = m_models.constFind(window);
     if (modelIt == m_models.constEnd()) {
-        KWin::effects->drawWindow(w, mask, region, data);
         return;
     }
 
-    KWin::GLTexture* texture = m_offscreenRenderer->render(w);
-    QVector<WindowQuad> quads = m_meshRenderer->makeGrid(w, m_gridResolution);
+    quads = quads.makeGrid(m_gridResolution);
     (*modelIt).apply(quads);
-
-    QRegion clipRegion = region;
-
-    if ((*modelIt).needsClip()) {
-        clipRegion = (*modelIt).clipRegion();
-    }
-
-    m_meshRenderer->render(w, quads, texture, clipRegion);
 }
 
 bool YetAnotherMagicLampEffect::isActive() const
@@ -226,7 +228,7 @@ void YetAnotherMagicLampEffect::slotWindowMinimized(KWin::EffectWindow* w)
     model.setParameters(m_modelParameters);
     model.start(Model::AnimationKind::Minimize);
 
-    m_offscreenRenderer->registerWindow(w);
+    redirect(w);
 
     KWin::effects->addRepaintFull();
 }
@@ -247,7 +249,7 @@ void YetAnotherMagicLampEffect::slotWindowUnminimized(KWin::EffectWindow* w)
     model.setParameters(m_modelParameters);
     model.start(Model::AnimationKind::Unminimize);
 
-    m_offscreenRenderer->registerWindow(w);
+    redirect(w);
 
     KWin::effects->addRepaintFull();
 }
@@ -260,7 +262,9 @@ void YetAnotherMagicLampEffect::slotWindowDeleted(KWin::EffectWindow* w)
 void YetAnotherMagicLampEffect::slotActiveFullScreenEffectChanged()
 {
     if (KWin::effects->activeFullScreenEffect() != nullptr) {
-        m_offscreenRenderer->unregisterAllWindows();
+        for (auto it = m_models.constBegin(); it != m_models.constEnd(); ++it) {
+            unredirect(it.key());
+        }
         m_models.clear();
     }
 }
